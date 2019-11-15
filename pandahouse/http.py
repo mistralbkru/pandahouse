@@ -17,9 +17,9 @@ class ClickhouseException(Exception):
 def prepare(query, connection=None, external=None):
     connection = merge(_default, connection or {})
     database = escape(connection['database'])
-    query = query.format(db=database)
+    # query = query.format(db=database)
     params = {'database': connection['database'],
-              'query': query,
+              # 'query': query,
               'user': connection['user'],
               'password': connection['password']}
     params = valfilter(lambda x: x, params)
@@ -41,11 +41,11 @@ def execute(query, connection=None, data=None, external=None, stream=False):
 
     # default limits of HTTP url length, for details see:
     # https://clickhouse.yandex/docs/en/single/index.html#http-interface
-    if len(params['query']) >= 15000 and data is None:
-        data = params.pop('query', None)
+    # if len(params['query']) >= 15000 and data is None:
+    #     data = params.pop('query', None)
 
     # basic auth
-    kwargs = dict(params=params, data=data, stream=stream, files=files)
+    kwargs = dict(params=params, data=query.encode('utf-8'), stream=stream, files=files)
     if 'user' in params and 'password' in params:
         kwargs['auth'] = (params['user'], params['password'])
         del params['user']
